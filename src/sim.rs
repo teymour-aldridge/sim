@@ -173,9 +173,13 @@ impl State {
             .iter()
             .find(|(_, their_position)| &&our_tagging_position == their_position);
 
-        if let Some((their_name, their_position)) = them {
+        if let Some((their_name, _)) = them {
             let their_name = their_name.clone();
-            let _ = their_position;
+
+            if self.most_recently_tagged.get(our_name) == Some(&their_name) {
+                // cannot tag them
+                return;
+            }
 
             self.is_it = their_name.clone();
             self.most_recently_tagged
