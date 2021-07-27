@@ -99,8 +99,8 @@ pub fn setup_simple_agent_simulation(n_players: u32) -> Simulation {
     })
 }
 
-pub fn run_simple_agent_simulation() {
-    let mut sim = setup_simple_agent_simulation(4);
+pub fn run_simple_agent_simulation(n_players: u32) {
+    let mut sim = setup_simple_agent_simulation(n_players);
 
     sim.run_simulation();
 }

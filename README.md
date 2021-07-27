@@ -31,8 +31,9 @@ This will tell you how much time each function took to execute, at each level of
 ## Screenshots
 
 ![Screenshot](./screenshot.png)
+![Running on Wasm](./wasm.png)
 
-(Dots in green are not it, dots in red are)
+(Dots in green are not "it", dots in red are "it")
 
 ## Tests
 

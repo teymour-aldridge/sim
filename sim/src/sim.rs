@@ -126,12 +126,12 @@ impl Simulation {
 
 #[derive(Debug)]
 pub struct State {
-    positions: HashMap<Arc<String>, Position>,
-    is_it: Arc<String>,
+    pub(crate) positions: HashMap<Arc<String>, Position>,
+    pub(crate) is_it: Arc<String>,
     /// A map of players who most recently tagged other players.
     ///
     /// Read as "key" most recently tagged "value"
-    most_recently_tagged: HashMap<Arc<String>, Arc<String>>,
+    pub(crate) most_recently_tagged: HashMap<Arc<String>, Arc<String>>,
 }
 
 impl State {
@@ -216,8 +216,8 @@ impl State {
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct Position {
-    x: i32,
-    y: i32,
+    pub(crate) x: i32,
+    pub(crate) y: i32,
 }
 
 impl Position {
@@ -247,4 +247,16 @@ pub enum Direction {
     Down,
     Left,
     Right,
+}
+
+impl Direction {
+    pub(crate) fn from_u8(int: u8) -> Result<Self, ()> {
+        Ok(match int {
+            0 => Self::Up,
+            1 => Self::Down,
+            2 => Self::Left,
+            3 => Self::Right,
+            _ => return Err(()),
+        })
+    }
 }

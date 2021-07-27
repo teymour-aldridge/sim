@@ -1,5 +1,5 @@
 [workspace]
-members = ["sim", "benchmarks", "main"]
+members = ["sim", "benchmarks", "main", "wasm_agent"]
 default-members = ["main"]
 
 [profile.bench]
