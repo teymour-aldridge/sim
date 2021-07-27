@@ -1,4 +1,20 @@
-use std::collections::HashMap;
+use std::{
+    borrow::{Borrow, BorrowMut},
+    collections::HashMap,
+    thread::sleep,
+    time::Duration,
+};
+
+use minifb::{Window, WindowOptions};
+use plotters::{
+    prelude::{
+        BitMapBackend, ChartBuilder, Circle, EmptyElement, IntoDrawingArea, PointSeries, Text,
+    },
+    style::{IntoFont, ShapeStyle, BLACK, GREEN, RED},
+};
+use plotters_bitmap::bitmap_pixel::BGRXPixel;
+
+use crate::buf::BufferWrapper;
 
 pub struct Simulation {
     state: State,
@@ -15,14 +31,82 @@ impl Simulation {
             let r#move = (agent)(&agent_name, &self.state);
             self.state.apply_move(agent_name, r#move);
         }
-        // todo: render
     }
 
     /// Runs the simulation forever.
     pub fn run_simulation(&mut self) {
+        let mut buf = BufferWrapper(vec![0u32; 400 * 400]);
+
+        let mut window = Window::new("tag", 400, 400, WindowOptions::default()).unwrap();
+
+        let root = BitMapBackend::<BGRXPixel>::with_buffer_and_format(buf.borrow_mut(), (400, 400))
+            .unwrap()
+            .into_drawing_area();
+
+        root.fill(&BLACK).unwrap();
+
+        let mut chart = ChartBuilder::on(&root)
+            .margin(10)
+            .set_all_label_area_size(10)
+            .build_cartesian_2d(-100..100, -100..100)
+            .unwrap();
+
+        chart
+            .configure_mesh()
+            .label_style(("sans-serif", 15).into_font().color(&GREEN))
+            .axis_style(&GREEN)
+            .draw()
+            .unwrap();
+
+        let cs = chart.into_chart_state();
+
+        drop(root);
+
         loop {
             self.run_step();
-            println!("{:#?}", self.state);
+            // make the simulation watchable
+            sleep(Duration::from_millis(100));
+            let root =
+                BitMapBackend::<BGRXPixel>::with_buffer_and_format(buf.borrow_mut(), (400, 400))
+                    .unwrap()
+                    .into_drawing_area();
+            let mut chart = cs.clone().restore(&root);
+            chart.plotting_area().fill(&BLACK).unwrap();
+            chart
+                .draw_series(PointSeries::of_element(
+                    self.state
+                        .positions
+                        .iter()
+                        .map(|(name, position)| (name, position)),
+                    5,
+                    ShapeStyle::from(&GREEN),
+                    &|(name, coord), size, style| {
+                        let is_it = self.state.is_it.as_ref() == Some(name);
+                        EmptyElement::at((coord.x, coord.y))
+                            + Circle::new(
+                                (0, 0),
+                                size,
+                                if is_it { ShapeStyle::from(&RED) } else { style },
+                            )
+                            + Text::new(
+                                {
+                                    if is_it {
+                                        format!("{} is IT", name)
+                                    } else {
+                                        name.clone()
+                                    }
+                                },
+                                (0, 15),
+                                ("sans-serif", 15),
+                            )
+                    },
+                ))
+                .unwrap();
+
+            drop(root);
+            drop(chart);
+
+            window.update_with_buffer(buf.borrow(), 400, 400).unwrap();
         }
     }
 }
