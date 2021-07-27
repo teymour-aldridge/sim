@@ -1,11 +1,14 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use rand::{thread_rng, Rng};
 
 use crate::sim::{Direction, Move, Position, Simulation, State};
 
-fn simple_agent(my_name: &str, state: &State) -> Move {
-    let pos = *state.positions().get(my_name).unwrap();
+fn simple_agent(my_name: &Arc<String>, state: &State) -> Move {
+    let pos = *state
+        .positions()
+        .get(&Arc::new(my_name.to_string()))
+        .unwrap();
 
     let (up, down, left, right) = (
         {
@@ -60,26 +63,27 @@ fn simple_agent(my_name: &str, state: &State) -> Move {
 }
 
 pub fn setup_simple_agent_simulation() -> Simulation {
+    let player_one = Arc::new("Player One".to_string());
     let state = State::new(
         {
             let mut positions = HashMap::new();
-            positions.insert("Player One".to_string(), Position::new(0, 0));
-            positions.insert("Player Two".to_string(), Position::new(5, 5));
-            positions.insert("Player Three".to_string(), Position::new(0, 5));
-            positions.insert("Player Four".to_string(), Position::new(5, 0));
+            positions.insert(player_one.clone(), Position::new(0, 0));
+            positions.insert(Arc::new("Player Two".to_string()), Position::new(5, 5));
+            positions.insert(Arc::new("Player Three".to_string()), Position::new(0, 5));
+            positions.insert(Arc::new("Player Four".to_string()), Position::new(5, 0));
             positions
         },
-        "Player One".to_string(),
+        player_one,
         HashMap::new(),
     );
 
     Simulation::new(
         state,
         vec![
-            ("Player One".to_string(), Box::new(simple_agent)),
-            ("Player Two".to_string(), Box::new(simple_agent)),
-            ("Player Three".to_string(), Box::new(simple_agent)),
-            ("Player Four".to_string(), Box::new(simple_agent)),
+            (Arc::new("Player One".to_string()), Box::new(simple_agent)),
+            (Arc::new("Player Two".to_string()), Box::new(simple_agent)),
+            (Arc::new("Player Three".to_string()), Box::new(simple_agent)),
+            (Arc::new("Player Four".to_string()), Box::new(simple_agent)),
         ],
     )
 }

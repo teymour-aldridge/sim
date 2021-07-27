@@ -1,6 +1,7 @@
 use std::{
     borrow::{Borrow, BorrowMut},
     collections::HashMap,
+    sync::Arc,
     thread::sleep,
     time::Duration,
 };
@@ -20,8 +21,8 @@ use crate::buf::BufferWrapper;
 pub struct Simulation {
     state: State,
     agents: Vec<(
-        String,
-        Box<dyn Fn(&str, &State) -> Move + Send + Sync + 'static>,
+        Arc<String>,
+        Box<dyn Fn(&Arc<String>, &State) -> Move + Send + Sync + 'static>,
     )>,
 }
 
@@ -29,8 +30,8 @@ impl Simulation {
     pub fn new(
         state: State,
         agents: Vec<(
-            String,
-            Box<dyn Fn(&str, &State) -> Move + Send + Sync + 'static>,
+            Arc<String>,
+            Box<dyn Fn(&Arc<String>, &State) -> Move + Send + Sync + 'static>,
         )>,
     ) -> Self {
         Self { state, agents }
@@ -98,7 +99,7 @@ impl Simulation {
                     5,
                     ShapeStyle::from(&GREEN),
                     &|(name, coord), size, style| {
-                        let is_it = &self.state.is_it == name;
+                        let is_it = Arc::ptr_eq(&self.state.is_it, name);
                         EmptyElement::at((coord.x, coord.y))
                             + Circle::new(
                                 (0, 0),
@@ -110,7 +111,7 @@ impl Simulation {
                                     if is_it {
                                         format!("{} is IT", name)
                                     } else {
-                                        name.clone()
+                                        name.to_string()
                                     }
                                 },
                                 (0, 15),
@@ -136,19 +137,19 @@ impl Simulation {
 
 #[derive(Debug)]
 pub struct State {
-    positions: HashMap<String, Position>,
-    is_it: String,
+    positions: HashMap<Arc<String>, Position>,
+    is_it: Arc<String>,
     /// A map of players who most recently tagged other players.
     ///
     /// Read as "key" most recently tagged "value"
-    most_recently_tagged: HashMap<String, String>,
+    most_recently_tagged: HashMap<Arc<String>, Arc<String>>,
 }
 
 impl State {
     pub fn new(
-        positions: HashMap<String, Position>,
-        is_it: String,
-        most_recently_tagged: HashMap<String, String>,
+        positions: HashMap<Arc<String>, Position>,
+        is_it: Arc<String>,
+        most_recently_tagged: HashMap<Arc<String>, Arc<String>>,
     ) -> Self {
         Self {
             positions,
@@ -157,14 +158,14 @@ impl State {
         }
     }
 
-    fn apply_move(&mut self, name: &str, r#move: Move) {
+    fn apply_move(&mut self, name: &Arc<String>, r#move: Move) {
         match r#move {
             Move::Direction(direction) => self.move_agent_in_direction(name, direction),
             Move::Tag(direction) => self.tag_other_agent_in_direction(name, direction),
         }
     }
 
-    fn move_agent_in_direction(&mut self, name: &str, direction: Direction) {
+    fn move_agent_in_direction(&mut self, name: &Arc<String>, direction: Direction) {
         let agent_position = *self.positions.get(name).unwrap();
 
         let mut new_position = agent_position.clone();
@@ -182,8 +183,8 @@ impl State {
         }
     }
 
-    fn tag_other_agent_in_direction(&mut self, our_name: &str, our_direction: Direction) {
-        if our_name == self.is_it {
+    fn tag_other_agent_in_direction(&mut self, our_name: &Arc<String>, our_direction: Direction) {
+        if Arc::ptr_eq(our_name, &self.is_it) {
             // cannot tag somebody if we're not it
             return;
         };
@@ -206,7 +207,7 @@ impl State {
 
             self.is_it = their_name.clone();
             self.most_recently_tagged
-                .insert(our_name.to_string(), their_name);
+                .insert(our_name.clone(), their_name);
         } else {
             // cannot tag somebody who isn't there
             return;
@@ -214,12 +215,12 @@ impl State {
     }
 
     /// Get a reference to the state's positions.
-    pub fn positions(&self) -> &HashMap<String, Position> {
+    pub fn positions(&self) -> &HashMap<Arc<String>, Position> {
         &self.positions
     }
 
     /// Get a reference to the state's most recently tagged.
-    pub fn most_recently_tagged(&self) -> &HashMap<String, String> {
+    pub fn most_recently_tagged(&self) -> &HashMap<Arc<String>, Arc<String>> {
         &self.most_recently_tagged
     }
 }
