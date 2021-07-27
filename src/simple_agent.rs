@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use rand::{thread_rng, Rng};
 
@@ -69,7 +69,7 @@ pub fn run_simple_agent_simulation() {
             positions.insert("Player Four".to_string(), Position::new(5, 0));
             positions
         },
-        Some("Player One".to_string()),
+        "Player One".to_string(),
         HashMap::new(),
     );
 

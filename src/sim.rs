@@ -81,7 +81,7 @@ impl Simulation {
                     5,
                     ShapeStyle::from(&GREEN),
                     &|(name, coord), size, style| {
-                        let is_it = self.state.is_it.as_ref() == Some(name);
+                        let is_it = &self.state.is_it == name;
                         EmptyElement::at((coord.x, coord.y))
                             + Circle::new(
                                 (0, 0),
@@ -114,7 +114,7 @@ impl Simulation {
 #[derive(Debug)]
 pub struct State {
     positions: HashMap<String, Position>,
-    is_it: Option<String>,
+    is_it: String,
     /// A map of players who most recently tagged other players.
     ///
     /// Read as "key" most recently tagged "value"
@@ -124,7 +124,7 @@ pub struct State {
 impl State {
     pub fn new(
         positions: HashMap<String, Position>,
-        is_it: Option<String>,
+        is_it: String,
         most_recently_tagged: HashMap<String, String>,
     ) -> Self {
         Self {
@@ -160,7 +160,7 @@ impl State {
     }
 
     fn tag_other_agent_in_direction(&mut self, our_name: &str, our_direction: Direction) {
-        if self.is_it.as_ref().map(|s| s.as_str()) != Some(our_name) {
+        if our_name == self.is_it {
             // cannot tag somebody if we're not it
             return;
         };
@@ -177,7 +177,7 @@ impl State {
             let their_name = their_name.clone();
             let _ = their_position;
 
-            self.is_it = Some(their_name.clone());
+            self.is_it = their_name.clone();
             self.most_recently_tagged
                 .insert(our_name.to_string(), their_name);
         } else {
