@@ -1,0 +1,17 @@
+[package]
+name = "sim"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+minifb = "0.19.3"
+plotters = "0.3.1"
+plotters-bitmap = "0.3.1"
+rand = "0.8.4"
+termion = "1.5.6"
+tui = "0.15.0"
+
+[dev-dependencies]
+criterion = "0.3.5"

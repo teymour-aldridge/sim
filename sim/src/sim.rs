@@ -111,6 +111,7 @@ impl Simulation {
     }
 
     /// Get a reference to the simulation's state.
+    #[allow(unused)]
     pub fn state(&self) -> &State {
         &self.state
     }
