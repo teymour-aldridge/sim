@@ -1,3 +1,6 @@
+mod sim;
+mod simple_agent;
+
 fn main() {
-    println!("Hello, world!");
+    simple_agent::run_simple_agent_simulation()
 }
