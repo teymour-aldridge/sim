@@ -2,8 +2,6 @@ use std::{
     borrow::{Borrow, BorrowMut},
     collections::HashMap,
     sync::Arc,
-    thread::sleep,
-    time::Duration,
 };
 
 use minifb::{Window, WindowOptions};
@@ -75,8 +73,6 @@ impl Simulation {
 
         loop {
             self.run_step();
-            // make the simulation watchable
-            sleep(Duration::from_millis(100));
             let root =
                 BitMapBackend::<BGRXPixel>::with_buffer_and_format(buf.borrow_mut(), (400, 400))
                     .unwrap()
