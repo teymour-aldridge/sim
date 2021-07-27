@@ -13,23 +13,40 @@ use plotters::{
     style::{IntoFont, ShapeStyle, BLACK, GREEN, RED},
 };
 use plotters_bitmap::bitmap_pixel::BGRXPixel;
+use rayon::prelude::*;
 
 use crate::buf::BufferWrapper;
 
 pub struct Simulation {
     state: State,
-    agents: Vec<(String, Box<dyn Fn(&str, &State) -> Move>)>,
+    agents: Vec<(
+        String,
+        Box<dyn Fn(&str, &State) -> Move + Send + Sync + 'static>,
+    )>,
 }
 
 impl Simulation {
-    pub fn new(state: State, agents: Vec<(String, Box<dyn Fn(&str, &State) -> Move>)>) -> Self {
+    pub fn new(
+        state: State,
+        agents: Vec<(
+            String,
+            Box<dyn Fn(&str, &State) -> Move + Send + Sync + 'static>,
+        )>,
+    ) -> Self {
         Self { state, agents }
     }
 
     pub fn run_step(&mut self) {
-        for (agent_name, agent) in &self.agents {
-            let r#move = (agent)(&agent_name, &self.state);
-            self.state.apply_move(agent_name, r#move);
+        let moves = self
+            .agents
+            .par_iter()
+            .map(|(agent_name, agent)| {
+                let r#move = (agent)(&agent_name, &self.state);
+                (agent_name, r#move)
+            })
+            .collect::<Vec<_>>();
+        for (name, r#move) in moves {
+            self.state.apply_move(name, r#move);
         }
     }
 

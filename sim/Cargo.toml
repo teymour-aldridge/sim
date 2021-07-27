@@ -10,6 +10,7 @@ minifb = "0.19.3"
 plotters = "0.3.1"
 plotters-bitmap = "0.3.1"
 rand = "0.8.4"
+rayon = "1.5.1"
 termion = "1.5.6"
 tui = "0.15.0"
 

@@ -1294,6 +1294,7 @@ dependencies = [
  "plotters",
  "plotters-bitmap",
  "rand",
+ "rayon",
  "termion",
  "tui",
 ]
