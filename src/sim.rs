@@ -26,7 +26,7 @@ impl Simulation {
         Self { state, agents }
     }
 
-    fn run_step(&mut self) {
+    pub fn run_step(&mut self) {
         for (agent_name, agent) in &self.agents {
             let r#move = (agent)(&agent_name, &self.state);
             self.state.apply_move(agent_name, r#move);
@@ -108,6 +108,11 @@ impl Simulation {
 
             window.update_with_buffer(buf.borrow(), 400, 400).unwrap();
         }
+    }
+
+    /// Get a reference to the simulation's state.
+    pub fn state(&self) -> &State {
+        &self.state
     }
 }
 
@@ -196,7 +201,7 @@ impl State {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct Position {
     x: i32,
     y: i32,

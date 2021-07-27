@@ -59,7 +59,7 @@ fn simple_agent(my_name: &str, state: &State) -> Move {
     }
 }
 
-pub fn run_simple_agent_simulation() {
+pub fn setup_simple_agent_simulation() -> Simulation {
     let state = State::new(
         {
             let mut positions = HashMap::new();
@@ -73,7 +73,7 @@ pub fn run_simple_agent_simulation() {
         HashMap::new(),
     );
 
-    let mut sim = Simulation::new(
+    Simulation::new(
         state,
         vec![
             ("Player One".to_string(), Box::new(simple_agent)),
@@ -81,7 +81,11 @@ pub fn run_simple_agent_simulation() {
             ("Player Three".to_string(), Box::new(simple_agent)),
             ("Player Four".to_string(), Box::new(simple_agent)),
         ],
-    );
+    )
+}
+
+pub fn run_simple_agent_simulation() {
+    let mut sim = setup_simple_agent_simulation();
 
     sim.run_simulation();
 }
