@@ -4,7 +4,7 @@ use crate::simple_agent::setup_simple_agent_simulation;
 
 #[test]
 fn test_state_invariants() {
-    let mut sim = setup_simple_agent_simulation();
+    let mut sim = setup_simple_agent_simulation(10000);
 
     for _ in 1..100000 {
         sim.run_step();

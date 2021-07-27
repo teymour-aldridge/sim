@@ -18,22 +18,15 @@ use rayon::prelude::*;
 
 use crate::buf::BufferWrapper;
 
+pub type AgentFunction = Box<dyn Fn(&Arc<String>, &State) -> Move + Send + Sync + 'static>;
+
 pub struct Simulation {
     state: State,
-    agents: Vec<(
-        Arc<String>,
-        Box<dyn Fn(&Arc<String>, &State) -> Move + Send + Sync + 'static>,
-    )>,
+    agents: Vec<(Arc<String>, AgentFunction)>,
 }
 
 impl Simulation {
-    pub fn new(
-        state: State,
-        agents: Vec<(
-            Arc<String>,
-            Box<dyn Fn(&Arc<String>, &State) -> Move + Send + Sync + 'static>,
-        )>,
-    ) -> Self {
+    pub fn new(state: State, agents: Vec<(Arc<String>, AgentFunction)>) -> Self {
         Self { state, agents }
     }
 

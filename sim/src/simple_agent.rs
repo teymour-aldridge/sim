@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use rand::{thread_rng, Rng};
 
-use crate::sim::{Direction, Move, Position, Simulation, State};
+use crate::sim::{AgentFunction, Direction, Move, Position, Simulation, State};
 
 fn simple_agent(my_name: &Arc<String>, state: &State) -> Move {
     let pos = *state
@@ -62,34 +62,45 @@ fn simple_agent(my_name: &Arc<String>, state: &State) -> Move {
     }
 }
 
-pub fn setup_simple_agent_simulation() -> Simulation {
-    let player_one = Arc::new("Player One".to_string());
+pub fn setup_simple_agent_simulation(n_players: u32) -> Simulation {
+    let player_one = Arc::new("Player 1".to_string());
+
+    let mut other_players = vec![];
+    for i in 1..=n_players {
+        other_players.push(Arc::new(format!("Player {}", i)))
+    }
+
     let state = State::new(
         {
             let mut positions = HashMap::new();
             positions.insert(player_one.clone(), Position::new(0, 0));
-            positions.insert(Arc::new("Player Two".to_string()), Position::new(5, 5));
-            positions.insert(Arc::new("Player Three".to_string()), Position::new(0, 5));
-            positions.insert(Arc::new("Player Four".to_string()), Position::new(5, 0));
+            for (index, player) in other_players.iter().enumerate() {
+                positions.insert(player.clone(), Position::new(index as i32, index as i32));
+            }
             positions
         },
         player_one,
         HashMap::new(),
     );
 
-    Simulation::new(
-        state,
-        vec![
-            (Arc::new("Player One".to_string()), Box::new(simple_agent)),
-            (Arc::new("Player Two".to_string()), Box::new(simple_agent)),
-            (Arc::new("Player Three".to_string()), Box::new(simple_agent)),
-            (Arc::new("Player Four".to_string()), Box::new(simple_agent)),
-        ],
-    )
+    Simulation::new(state, {
+        let func: AgentFunction = Box::new(simple_agent);
+        let mut vec = vec![(Arc::new("Player 1".to_string()), func)];
+        vec.append(
+            &mut other_players
+                .into_iter()
+                .map(|string| {
+                    let func: AgentFunction = Box::new(simple_agent);
+                    (string, func)
+                })
+                .collect::<Vec<_>>(),
+        );
+        vec
+    })
 }
 
 pub fn run_simple_agent_simulation() {
-    let mut sim = setup_simple_agent_simulation();
+    let mut sim = setup_simple_agent_simulation(4);
 
     sim.run_simulation();
 }
