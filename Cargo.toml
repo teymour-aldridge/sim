@@ -1,2 +1,5 @@
 [workspace]
 members = ["sim", "benchmarks", "main"]
+
+[profile.bench]
+debug = true
