@@ -1,4 +1,4 @@
-use std::{collections::HashSet};
+use std::collections::HashSet;
 
 use crate::simple_agent::setup_simple_agent_simulation;
 
@@ -26,5 +26,12 @@ fn test_state_invariants() {
             println!("{:#?}", d);
             assert!(false);
         }
+
+        // check that players cannot tag themselves
+        sim.state()
+            .most_recently_tagged()
+            .iter()
+            .map(|(a, b)| assert_ne!(a, b))
+            .for_each(drop);
     }
 }

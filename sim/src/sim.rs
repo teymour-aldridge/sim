@@ -217,6 +217,11 @@ impl State {
     pub fn positions(&self) -> &HashMap<String, Position> {
         &self.positions
     }
+
+    /// Get a reference to the state's most recently tagged.
+    pub fn most_recently_tagged(&self) -> &HashMap<String, String> {
+        &self.most_recently_tagged
+    }
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
