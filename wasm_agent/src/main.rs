@@ -1,3 +1,5 @@
+//! A simple demonstration of how a WebAssembly agent might be written.
+
 fn main() {
     // // todo: make the parser more robust
     // let stdin = stdin();
