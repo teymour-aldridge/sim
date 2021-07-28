@@ -33,7 +33,7 @@ impl Simulation {
             .agents
             .par_iter()
             .map(|(agent_name, agent)| {
-                let r#move = (agent)(&agent_name, &self.state);
+                let r#move = (agent)(agent_name, &self.state);
                 (agent_name, r#move)
             })
             .collect::<Vec<_>>();
@@ -157,7 +157,7 @@ impl State {
     fn move_agent_in_direction(&mut self, name: &Arc<String>, direction: Direction) {
         let agent_position = *self.positions.get(name).unwrap();
 
-        let mut new_position = agent_position.clone();
+        let mut new_position = agent_position;
         new_position.move_in_direction(direction);
 
         let someone_already_there = self
@@ -166,9 +166,9 @@ impl State {
             .any(|(_, position)| &new_position == position);
 
         if !someone_already_there {
-            self.positions.get_mut(name).map(|position| {
+            if let Some(position) = self.positions.get_mut(name) {
                 position.move_in_direction(direction);
-            });
+            }
         }
     }
 
@@ -199,7 +199,6 @@ impl State {
                 .insert(our_name.clone(), their_name);
         } else {
             // cannot tag somebody who isn't there
-            return;
         }
     }
 

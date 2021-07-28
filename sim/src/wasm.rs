@@ -8,6 +8,7 @@ use wasmtime_wasi::WasiCtxBuilder;
 
 use crate::sim::{AgentFunction, Direction, Move, State};
 
+#[allow(clippy::result_unit_err)]
 pub fn wasm_agent(
     wasm_file: impl AsRef<Path> + Send + Sync + 'static,
 ) -> Result<AgentFunction, ()> {
@@ -64,7 +65,7 @@ pub fn wasm_agent(
         // it sort of makes sense to ask for one back
         let res = String::from_utf8(read.to_vec()).unwrap();
 
-        let mut iter = res.split(" ");
+        let mut iter = res.split(' ');
 
         let move_dont_tag = iter.next().unwrap().trim().parse::<bool>().unwrap();
         let direction = iter.next().unwrap().trim().parse::<u8>().unwrap();
@@ -80,16 +81,16 @@ pub fn wasm_agent(
 
 impl fmt::Display for State {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "positions:\n")?;
+        writeln!(f, "positions:")?;
         for (name, position) in self.positions() {
-            write!(f, "{}:({},{})\n", name, position.x, position.y)?;
+            writeln!(f, "{}:({},{})", name, position.x, position.y)?;
         }
         write!(f, "STOP")?;
         write!(f, "is_it:{}", self.is_it)?;
         write!(f, "STOP")?;
-        write!(f, "who_tagged_who:\n")?;
+        writeln!(f, "who_tagged_who:")?;
         for (tagger, tagged) in self.most_recently_tagged.iter() {
-            write!(f, "{}:{}\n", tagger, tagged)?;
+            writeln!(f, "{}:{}", tagger, tagged)?;
         }
         write!(f, "STOP")
     }

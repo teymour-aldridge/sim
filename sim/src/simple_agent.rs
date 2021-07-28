@@ -12,22 +12,22 @@ pub(crate) fn simple_agent(my_name: &Arc<String>, state: &State) -> Move {
 
     let (up, down, left, right) = (
         {
-            let mut x = pos.clone();
+            let mut x = pos;
             x.move_in_direction(Direction::Up);
             x
         },
         {
-            let mut x = pos.clone();
+            let mut x = pos;
             x.move_in_direction(Direction::Down);
             x
         },
         {
-            let mut x = pos.clone();
+            let mut x = pos;
             x.move_in_direction(Direction::Left);
             x
         },
         {
-            let mut x = pos.clone();
+            let mut x = pos;
             x.move_in_direction(Direction::Right);
             x
         },
