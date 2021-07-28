@@ -46,5 +46,7 @@ This will tell you how much time each function took to execute, at each level of
 To test this library, run
 
 ```cargo
-cargo test
+cargo test --workspace
 ```
+
+(the `--workspace` flag is essential)
