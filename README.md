@@ -8,6 +8,12 @@ To run this, type:
 cargo run
 ```
 
+To run a demonstration Wasm agent, simply run
+
+```shell
+cargo run -- --wasm agent.wat
+```
+
 This will open up a window and show you how the game of tag is progressing.
 
 ## Performance analysis
