@@ -1,8 +1,9 @@
 # Note for implementors of WebAssembly modules.
 
-You will need to use Wasi.
+WebAssembly modules will need to use [Wasi](https://wasi.dev), the WebAssembly systems interface.
 
-Input will be fed to the standard input, which will look something like this:
+Input describing the game state will be fed to the standard input. The input will look something
+like this:
 
 ```
 positions:
@@ -21,13 +22,16 @@ value should be in the form `<boolean> <number>`, where `<boolean>` is either `t
 
 For an example, have a look at `wasm_agent`.
 
-To run a given Wasm module, try this command:
+To run a given Wasm module, use this command:
 
 ```shell
 cargo run -- --wasm <wasm file name>
 ```
 
 e.g.
+
 ```shell
 cargo run -- --wasm agent.wat
 ```
+
+Modules can be in either WebAssembly text format or WebAssembly binary format.
