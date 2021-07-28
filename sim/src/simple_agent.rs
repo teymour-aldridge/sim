@@ -4,7 +4,7 @@ use rand::{thread_rng, Rng};
 
 use crate::sim::{AgentFunction, Direction, Move, Position, Simulation, State};
 
-fn simple_agent(my_name: &Arc<String>, state: &State) -> Move {
+pub(crate) fn simple_agent(my_name: &Arc<String>, state: &State) -> Move {
     let pos = *state
         .positions()
         .get(&Arc::new(my_name.to_string()))

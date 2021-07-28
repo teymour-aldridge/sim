@@ -19,7 +19,7 @@ use crate::buf::BufferWrapper;
 pub type AgentFunction = Box<dyn Fn(&Arc<String>, &State) -> Move + Send + Sync + 'static>;
 
 pub struct Simulation {
-    state: State,
+    pub(crate) state: State,
     agents: Vec<(Arc<String>, AgentFunction)>,
 }
 
@@ -147,7 +147,7 @@ impl State {
         }
     }
 
-    fn apply_move(&mut self, name: &Arc<String>, r#move: Move) {
+    pub(crate) fn apply_move(&mut self, name: &Arc<String>, r#move: Move) {
         match r#move {
             Move::Direction(direction) => self.move_agent_in_direction(name, direction),
             Move::Tag(direction) => self.tag_other_agent_in_direction(name, direction),
@@ -173,7 +173,7 @@ impl State {
     }
 
     fn tag_other_agent_in_direction(&mut self, our_name: &Arc<String>, our_direction: Direction) {
-        if Arc::ptr_eq(our_name, &self.is_it) {
+        if !Arc::ptr_eq(our_name, &self.is_it) {
             // cannot tag somebody if we're not it
             return;
         };
@@ -190,7 +190,7 @@ impl State {
             let their_name = their_name.clone();
 
             if self.most_recently_tagged.get(our_name) == Some(&their_name) {
-                // cannot tag them
+                // cannot tag ourself
                 return;
             }
 

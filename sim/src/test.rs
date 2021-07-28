@@ -1,8 +1,16 @@
-use std::collections::HashSet;
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+};
 
-use crate::simple_agent::setup_simple_agent_simulation;
+use crate::{
+    sim::{Direction, Move, Position, Simulation, State},
+    simple_agent::{self, setup_simple_agent_simulation},
+};
 
 #[test]
+// this test is more a "property-based test" – it makes sure that several things that always should
+// be true remain true.
 fn test_state_invariants() {
     let mut sim = setup_simple_agent_simulation(10000);
 
@@ -34,4 +42,39 @@ fn test_state_invariants() {
             .map(|(a, b)| assert_ne!(a, b))
             .for_each(drop);
     }
+}
+
+#[test]
+// a simple example-based test
+fn test_can_tag() {
+    let player_one = Arc::new("Player 1".to_string());
+    let player_two = Arc::new("Player 2".to_string());
+    let state = State::new(
+        {
+            let mut res = HashMap::new();
+            res.insert(player_one.clone(), Position::new(5, 5));
+            res.insert(player_two.clone(), Position::new(5, 6));
+            res
+        },
+        player_one.clone(),
+        HashMap::new(),
+    );
+    let mut simulation = Simulation::new(
+        state,
+        vec![
+            (player_one.clone(), Box::new(simple_agent::simple_agent)),
+            (player_two.clone(), Box::new(simple_agent::simple_agent)),
+        ],
+    );
+    simulation
+        .state
+        .apply_move(&player_one, Move::Direction(Direction::Up));
+    assert_eq!(
+        simulation.state.positions().get(&player_one),
+        Some(&Position::new(5, 5))
+    );
+    simulation
+        .state
+        .apply_move(&player_one, Move::Tag(Direction::Up));
+    assert_eq!(simulation.state.is_it, player_two);
 }
